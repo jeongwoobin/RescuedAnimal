@@ -24,7 +24,7 @@ data class SidoEntity(
 @Entity(tableName = "animal")
 data class AnimalEntity(
     @PrimaryKey(autoGenerate = false)
-    val desertionNo: String?,
+    val desertionNo: String,
     val filename: String?,
     val happenDt: String?,
     val happenPlace: String?,

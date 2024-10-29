@@ -6,11 +6,9 @@ import com.example.rescuedanimals.domain.repository.local.FavoriteAnimalReposito
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class GetFavoriteAnimalUseCase@Inject constructor(
+class GetFavoriteAnimalUseCase @Inject constructor(
     private val repo: FavoriteAnimalRepository
 ) {
 
-    suspend operator fun invoke(): Flow<Result<List<Animal>>> {
-        return repo.getAll()
-    }
+    suspend operator fun invoke(): Flow<Result<List<Animal>>> = repo.getAll()
 }

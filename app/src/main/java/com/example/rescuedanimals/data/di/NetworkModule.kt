@@ -1,9 +1,9 @@
 package com.example.rescuedanimals.data.di
 
 import com.example.rescuedanimals.BuildConfig
-import com.example.rescuedanimals.data.service.RescuedAnimalsApi
 import com.example.rescuedanimals.data.util.AuthInterceptor
 import com.example.rescuedanimals.data.util.PublicSrvcParamInterceptor
+import com.orhanobut.logger.Logger
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
@@ -12,10 +12,13 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import org.json.JSONException
+import org.json.JSONObject
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Named
 import javax.inject.Singleton
+
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -35,9 +38,9 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideHttpLoggingInterceptor(): HttpLoggingInterceptor {
-        return HttpLoggingInterceptor().apply {
-            setLevel(HttpLoggingInterceptor.Level.BODY)
-        }
+        return HttpLoggingInterceptor { message ->
+            Logger.t("Okhttp").i(message)
+        }.setLevel(level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE)
     }
 
     @Provides

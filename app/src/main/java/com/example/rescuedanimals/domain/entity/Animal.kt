@@ -1,7 +1,12 @@
 package com.example.rescuedanimals.domain.entity
 
+import androidx.annotation.Keep
+import com.squareup.moshi.JsonClass
+
+@Keep
+@JsonClass(generateAdapter = true)
 data class Animal(
-    val desertionNo: String?,
+    val desertionNo: String,
     val filename: String?,
     val happenDt: String?,
     val happenPlace: String?,

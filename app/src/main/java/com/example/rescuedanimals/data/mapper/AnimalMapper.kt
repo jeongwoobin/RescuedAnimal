@@ -34,10 +34,10 @@ object AnimalMapper {
             officetel = entity.officetel,
         )
 
-    fun mapperToAnimalList(AnimalEntity: List<AnimalEntity>): List<Animal> {
+    fun mapperToAnimalList(animalEntity: List<AnimalEntity>): List<Animal> {
         val animals = mutableListOf<Animal>()
 
-        AnimalEntity.forEach { entity ->
+        animalEntity.forEach { entity ->
             animals.add(mapperToAnimal(entity))
         }
         return animals.toList()

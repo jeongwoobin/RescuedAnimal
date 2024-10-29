@@ -1,97 +1,91 @@
 package com.example.rescuedanimals.presentation.screens.rescuedAnimalScreen
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRowScopeInstance.weight
-import androidx.compose.foundation.layout.R
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.example.rescuedanimals.domain.entity.Animal
+import com.example.rescuedanimals.presentation.component.BaseScreen
+import com.example.rescuedanimals.presentation.component.CustomPullToRefreshBox
+import com.example.rescuedanimals.presentation.component.GoToTopFAB
+import com.example.rescuedanimals.presentation.component.Header
+import com.example.rescuedanimals.presentation.component.LinearProgressBar
+import com.example.rescuedanimals.presentation.component.AnimalList
 import com.example.rescuedanimals.presentation.component.ScreenDivider
-import com.example.rescuedanimals.presentation.component.VectorIcon
 import com.example.rescuedanimals.presentation.navigation.Screen
-import com.example.rescuedanimals.ui.theme.Primary_Red_500
-import com.example.rescuedanimals.ui.theme.Text_600
+import kotlinx.coroutines.launch
 
 @Composable
 fun RescuedAnimalScreen(
     navController: NavController,
     rescuedAnimalViewModel: RescuedAnimalViewModel = hiltViewModel()
 ) {
+    val coroutineScope = rememberCoroutineScope()
+    val listState = rememberLazyListState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val snackbar by rescuedAnimalViewModel.snackbarEvent.collectAsStateWithLifecycle()
 
-    Scaffold(modifier = Modifier.fillMaxSize()) {
-        Column(modifier = Modifier.padding(it)) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.End
-            ) {
-                VectorIcon(
-                    modifier = Modifier.clickable {
-                        navController.navigate(Screen.FavoriteScreen.route)
-                    },
-                    vector = Icons.Filled.Favorite,
-                    tint = Primary_Red_500,
-                    contentDescription = "go to FavoriteScreen"
-                )
-            }
-            ScreenDivider(modifier = Modifier.padding(vertical = 10.dp))
-            RescuedAnimalList()
+    LaunchedEffect(Unit) {
+        rescuedAnimalViewModel.getRescuedAnimal(refresh = true)
+    }
+
+    LaunchedEffect(snackbar) {
+        snackbar.getContentIfNotHandled()?.let {
+            snackbarHostState.showSnackbar(it, null)
         }
     }
-}
 
-@Composable
-fun RescuedAnimalList(list: List<Animal>) {
-    LazyColumn(modifier = Modifier
-        .fillMaxWidth()) {
-        itemsIndexed(list) { index, item ->
-            RescuedAnimalItem(index = index, item = item, isSelected = index == viewModel.selectedIndex, onClicked = { i -> viewModel.setSelectedIndex(i) })
-            if(index != list.lastIndex) ScreenDivider(modifier = Modifier.padding(horizontal = 20.dp))
-        }
-    }
-}
-
-
-@Composable
-fun RescuedAnimalItem(index: Int, item: Animal, isSelected: Boolean, onClicked: (Int) -> Unit) {
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .clickable {
-            onClicked(index)
-        }
-        .padding(20.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text(modifier = Modifier.weight(1f), text = item)
-        if(isSelected) {
-            Spacer(modifier = Modifier.width(10.dp))
-            VectorIcon(
-                vector = Icons.Filled.FavoriteBorder,
-                tint = Text_600,
-                contentDescription = null
+    BaseScreen(
+        snackbarHostState = snackbarHostState,
+        loadingStateFlow = rescuedAnimalViewModel.resultState,
+        loadingProgressBar = { LinearProgressBar() },
+        fab = {
+            GoToTopFAB(onClicked = {
+                coroutineScope.launch {
+                    // Scroll to the top of the list when the FAB is clicked
+                    listState.animateScrollToItem(0)
+                }
+            })
+        }) {
+        Header(
+            route = Screen.RescuedAnimalScreen,
+            rightButtonClicked = {
+                navController.navigate(Screen.FavoriteScreen.route)
+            })
+        ScreenDivider(modifier = Modifier.padding(horizontal = 20.dp))
+        CustomPullToRefreshBox(
+            modifier = Modifier
+                .weight(1f)
+                .padding(horizontal = 20.dp),
+            onRefresh = { rescuedAnimalViewModel.getRescuedAnimal(refresh = true) }) {
+            AnimalList(
+                modifier = Modifier.fillMaxSize(),
+                listState = listState,
+                itemListState = rescuedAnimalViewModel.rescuedAnimalList,
+                onLoadMore = { refresh ->
+                    coroutineScope.launch {
+                        rescuedAnimalViewModel.getRescuedAnimal(
+                            refresh = refresh
+                        )
+                    }
+                },
+                itemClicked = { index, animal ->
+                    coroutineScope.launch {
+                        rescuedAnimalViewModel.insertFavoriteAnimal(
+                            index = index,
+                            animal = animal
+                        )
+                    }
+                }
             )
         }
     }

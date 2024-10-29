@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -31,17 +32,20 @@ import com.example.rescuedanimals.BuildConfig
 import com.example.rescuedanimals.presentation.component.ScreenDivider
 import com.example.rescuedanimals.presentation.navigation.MainNavGraph
 import com.example.rescuedanimals.ui.theme.Primary_Red_500
+import com.example.rescuedanimals.ui.theme.Purple200
 import com.example.rescuedanimals.ui.theme.RescuedAnimalsTheme
+import com.example.rescuedanimals.ui.theme.Success
+import com.orhanobut.logger.Logger
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+//        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
-            RescuedAnimalsTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+            RescuedAnimalsTheme(darkTheme = false) {
+                Scaffold(modifier = Modifier.fillMaxSize().background(color = Color.White)) { innerPadding ->
                     Box(modifier = Modifier.padding(innerPadding)) {
                         SetNavigation()
                     }

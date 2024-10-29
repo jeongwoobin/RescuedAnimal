@@ -1,5 +1,8 @@
 package com.example.rescuedanimals.data.di
 
+import com.example.rescuedanimals.data.database.FavoriteAnimalDao
+import com.example.rescuedanimals.data.datasource.local.FavoriteAnimalDataSource
+import com.example.rescuedanimals.data.datasource.local.FavoriteAnimalDataSourceImpl
 import com.example.rescuedanimals.data.service.RescuedAnimalsApi
 import com.example.rescuedanimals.data.datasource.remote.RescuedAnimalsDataSource
 import com.example.rescuedanimals.data.datasource.remote.RescuedAnimalsDataSourceImpl
@@ -17,5 +20,11 @@ class DataSourceModule {
     @Singleton
     fun provideRescuedAnimalRemoteDataSource(rescuedAnimalsApi: RescuedAnimalsApi): RescuedAnimalsDataSource {
         return RescuedAnimalsDataSourceImpl(rescuedAnimalsApi)
+    }
+
+    @Provides
+    @Singleton
+    fun provideFavoriteAnimalDataSource(favoriteAnimalDao: FavoriteAnimalDao): FavoriteAnimalDataSource {
+        return FavoriteAnimalDataSourceImpl(favoriteAnimalDao)
     }
 }

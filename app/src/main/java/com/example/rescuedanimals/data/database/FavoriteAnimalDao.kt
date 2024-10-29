@@ -4,7 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.example.rescuedanimals.data.model.local.AnimalEntity
+import com.example.rescuedanimals.data.model.remote.AnimalEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -12,14 +12,14 @@ interface FavoriteAnimalDao {
 
     // 생성
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertFavoriteAnimal(favoriteAnimal: AnimalEntity): Flow<Long>
+    fun insertFavoriteAnimal(favoriteAnimal: AnimalEntity): Long
 
     // 삭제
     @Query("DELETE FROM animal where desertionNo = :desertionNo")
-    fun deleteFavoriteAnimal(desertionNo: String): Flow<Long>
+    fun deleteFavoriteAnimal(desertionNo: String): Int
 
     @Query("DELETE FROM animal")
-    fun deleteAll(): Flow<Long>
+    fun deleteAll(): Int
 
 //    // 업데이트
 //    @Query("UPDATE sido SET sido_title = :title WHERE id = :id")

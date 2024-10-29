@@ -6,42 +6,60 @@ import com.example.rescuedanimals.domain.entity.Animal
 import com.example.rescuedanimals.domain.entity.Result
 import com.example.rescuedanimals.domain.repository.local.FavoriteAnimalRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class FavoriteAnimalRepositoryImpl @Inject constructor(
     private val favoriteAnimalDataSource: FavoriteAnimalDataSource
 ) : FavoriteAnimalRepository {
-    override suspend fun getAll(): Flow<Result<List<Animal>>> = flow {
-        favoriteAnimalDataSource.getAll().collect { value ->
-            emit(Result.success(AnimalMapper.mapperToAnimalList(value)))
-        }
-    }
+    override suspend fun getAll(): Flow<Result<List<Animal>>> =
+        favoriteAnimalDataSource.getAll()
+            .map { value ->
+                Result.success(AnimalMapper.mapperToAnimalList(value))
+            }.catch {
+                emit(Result.fail(message = "저장된 데이터를 가져오는데 실패했습니다."))
+            }
 
-    override suspend fun getFavoriteAnimal(desertionNo: String): Flow<Result<Animal>> = flow {
+
+    override suspend fun getFavoriteAnimal(desertionNo: String): Flow<Result<Animal>> =
         favoriteAnimalDataSource.getFavoriteAnimal(desertionNo = desertionNo)
-            .collect { value -> emit( Result.success(AnimalMapper.mapperToAnimal(value))) }
-    }
+            .map { value -> Result.success(AnimalMapper.mapperToAnimal(value)) }
+            .catch {
+                emit(Result.fail(message = "저장된 데이터를 가져오는데 실패했습니다."))
+            }
 
     override suspend fun insertFavoriteAnimal(favoriteAnimal: Animal): Flow<Result<Boolean>> =
-        flow {
-            favoriteAnimalDataSource.insertFavoriteAnimal(
-                favoriteAnimal = AnimalMapper.mapperToAnimalEntity(
-                    favoriteAnimal
-                )
+        favoriteAnimalDataSource.insertFavoriteAnimal(
+            favoriteAnimal = AnimalMapper.mapperToAnimalEntity(
+                favoriteAnimal
             )
-                .collect { value -> if (value != 0L) emit(Result.success(true)) else emit(Result.fail()) }
+        ).map { value ->
+            if (value != 0L)
+                Result.success(true)
+            else
+                Result.error(message = "데이터 저장 오류")
+        }.catch {
+            emit(Result.fail(message = "데이터를 저장하는데 실패했습니다."))
         }
 
     override suspend fun deleteFavoriteAnimal(desertionNo: String): Flow<Result<Boolean>> =
-        flow {
-            favoriteAnimalDataSource.deleteFavoriteAnimal(desertionNo = desertionNo)
-                .collect { value -> if (value != 0L) emit(Result.success(true)) else emit(Result.fail()) }
-        }
+        favoriteAnimalDataSource.deleteFavoriteAnimal(desertionNo = desertionNo)
+            .map { value ->
+                if (value != 0) (Result.success(true))
+                else Result.error(message = "데이터 삭제 오류")
+            }
+            .catch {
+                emit(Result.fail(message = "데이터를 삭제하는데 실패했습니다."))
+            }
 
     override suspend fun deleteAll(): Flow<Result<Boolean>> =
-        flow {
-            favoriteAnimalDataSource.deleteAll()
-                .collect { value -> if (value != 0L) emit(Result.success(true)) else emit(Result.fail()) }
-        }
+        favoriteAnimalDataSource.deleteAll()
+            .map { value ->
+                if (value != 0) Result.success(true)
+                else Result.fail(message = "데이터 삭제 오류패")
+            }
+            .catch {
+                emit(Result.fail(message = "데이터를 삭제하는데 실패했습니다."))
+            }
 }

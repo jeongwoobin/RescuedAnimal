@@ -10,7 +10,7 @@ interface FavoriteAnimalDataSource {
 
     suspend fun insertFavoriteAnimal(favoriteAnimal: AnimalEntity): Flow<Long>
 
-    suspend fun deleteFavoriteAnimal(desertionNo: String): Flow<Long>
+    suspend fun deleteFavoriteAnimal(desertionNo: String): Flow<Int>
 
-    suspend fun deleteAll(): Flow<Long>
+    suspend fun deleteAll(): Flow<Int>
 }

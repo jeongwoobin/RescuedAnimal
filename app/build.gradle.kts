@@ -102,8 +102,10 @@ dependencies {
     annotationProcessor(libs.androidx.room.compiler)
 //    implementation(libs.sandwich)
 //    implementation(libs.sandwich.retrofit)
-//    implementation(libs.androidx.paging.runtime.ktx)
-//    implementation(libs.androidx.paging.compose)
+    implementation(libs.androidx.paging.runtime.ktx)
+    implementation(libs.androidx.paging.compose)
 
     implementation(libs.androidx.material.icons.extended)
+
+    implementation(libs.landscapist.glide)
 }
