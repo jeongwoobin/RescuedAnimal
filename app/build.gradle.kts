@@ -108,4 +108,6 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
 
     implementation(libs.landscapist.glide)
+    implementation(libs.androidx.adaptive)
+    implementation(libs.androidx.window.size)
 }

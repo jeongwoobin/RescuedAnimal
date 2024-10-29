@@ -1,13 +1,15 @@
 package com.example.rescuedanimals.presentation.component
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.ArrowCircleUp
@@ -21,6 +23,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
@@ -36,6 +39,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.dp
+import androidx.window.core.layout.WindowHeightSizeClass
 import com.example.rescuedanimals.presentation.navigation.Screen
 import com.example.rescuedanimals.ui.theme.Line_Thin
 import com.example.rescuedanimals.ui.theme.Primary_Red_500
@@ -45,35 +49,71 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-fun Header(backButtonClicked: (() -> Unit)? = null, route: Screen, rightButtonClicked: (() -> Unit)? = null) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 10.dp, horizontal = 20.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        backButtonClicked?.let { onClicked ->
-            VectorIcon(
-                modifier = Modifier.clickable {
-                    onClicked()
-                },
-                vector = Icons.Default.ArrowBackIosNew,
-                tint = Text_600,
-                contentDescription = "go to back"
-            )
+fun Header(
+    backButtonClicked: (() -> Unit)? = null,
+    route: Screen,
+    rightButtonClicked: (() -> Unit)? = null
+) {
+    val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
+
+    if (windowSizeClass.windowHeightSizeClass == WindowHeightSizeClass.COMPACT)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 10.dp, horizontal = 20.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            backButtonClicked?.let { onClicked ->
+                VectorIcon(
+                    modifier = Modifier.clickable {
+                        onClicked()
+                    },
+                    vector = Icons.Default.ArrowBackIosNew,
+                    tint = Text_600,
+                    contentDescription = "go to back"
+                )
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            rightButtonClicked?.let { onClicked ->
+                VectorIcon(
+                    modifier = Modifier.clickable {
+                        onClicked()
+                    },
+                    vector = if (route == Screen.RescuedAnimalScreen) Icons.Default.Favorite else Icons.Default.FormatListNumbered,
+                    tint = if (route == Screen.RescuedAnimalScreen) Primary_Red_500 else Text_600,
+                    contentDescription = "right button icon"
+                )
+            }
         }
-        Spacer(modifier = Modifier.weight(1f))
-        rightButtonClicked?.let { onClicked ->
-            VectorIcon(
-                modifier = Modifier.clickable {
-                    onClicked()
-                },
-                vector = if(route == Screen.RescuedAnimalScreen) Icons.Default.Favorite else Icons.Default.FormatListNumbered,
-                tint = if(route == Screen.RescuedAnimalScreen) Primary_Red_500 else Text_600,
-                contentDescription = "right button icon"
-            )
+    else
+        Column(
+            modifier = Modifier
+                .fillMaxHeight()
+                .padding(vertical = 20.dp, horizontal = 10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            backButtonClicked?.let { onClicked ->
+                VectorIcon(
+                    modifier = Modifier.clickable {
+                        onClicked()
+                    },
+                    vector = Icons.Default.ArrowBackIosNew,
+                    tint = Text_600,
+                    contentDescription = "go to back"
+                )
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            rightButtonClicked?.let { onClicked ->
+                VectorIcon(
+                    modifier = Modifier.clickable {
+                        onClicked()
+                    },
+                    vector = if (route == Screen.RescuedAnimalScreen) Icons.Default.Favorite else Icons.Default.FormatListNumbered,
+                    tint = if (route == Screen.RescuedAnimalScreen) Primary_Red_500 else Text_600,
+                    contentDescription = "right button icon"
+                )
+            }
         }
-    }
 }
 
 @Composable
@@ -88,11 +128,20 @@ fun GoToTopFAB(onClicked: () -> Unit) {
 }
 
 @Composable
-fun ScreenDivider(modifier: Modifier = Modifier, color: Color = Line_Thin) {
+fun HorizontalDivider(modifier: Modifier = Modifier, color: Color = Line_Thin) {
     HorizontalDivider(
         modifier = modifier
             .height(1.dp)
             .fillMaxWidth(), color = color
+    )
+}
+
+@Composable
+fun VerticalDivider(modifier: Modifier = Modifier, color: Color = Line_Thin) {
+    HorizontalDivider(
+        modifier = modifier
+            .width(1.dp)
+            .fillMaxHeight(), color = color
     )
 }
 

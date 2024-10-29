@@ -84,7 +84,6 @@ class RescuedAnimalViewModel @Inject constructor(
                                     updateSnackbarEvent(Utils.snackBarContent(content = "마지막 데이터 입니다."))
                                 }
                                 updatePage()
-                                pageNo = -4
                             }
                         }
 

@@ -18,7 +18,7 @@ import com.example.rescuedanimals.presentation.component.BaseScreen
 import com.example.rescuedanimals.presentation.component.CustomPullToRefreshBox
 import com.example.rescuedanimals.presentation.component.GoToTopFAB
 import com.example.rescuedanimals.presentation.component.Header
-import com.example.rescuedanimals.presentation.component.ScreenDivider
+import com.example.rescuedanimals.presentation.component.HorizontalDivider
 import com.example.rescuedanimals.presentation.navigation.Screen
 import com.example.rescuedanimals.presentation.component.AnimalList
 import kotlinx.coroutines.launch
@@ -58,10 +58,10 @@ fun FavoriteScreen(
             rightButtonClicked = {
                 navController.navigate(Screen.RescuedAnimalScreen.route)
             })
-        ScreenDivider(modifier = Modifier.padding(horizontal = 20.dp))
+        HorizontalDivider(modifier = Modifier.padding(horizontal = 20.dp))
         CustomPullToRefreshBox(
             modifier = Modifier
-                .weight(1f)
+//                .weight(1f)
                 .padding(horizontal = 20.dp),
             onRefresh = { favoriteViewModel.getFavoriteAnimal() }) {
             AnimalList(

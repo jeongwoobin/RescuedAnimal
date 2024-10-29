@@ -2,16 +2,27 @@ package com.example.rescuedanimals.presentation.component
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -19,19 +30,24 @@ import androidx.compose.material.icons.filled.Downloading
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.window.core.layout.WindowHeightSizeClass
 import com.example.rescuedanimals.domain.entity.Animal
 import com.example.rescuedanimals.ui.theme.Diary_Green_400
 import com.skydoves.landscapist.ImageOptions
@@ -47,6 +63,7 @@ fun AnimalList(
     onLoadMore: (Boolean) -> Unit,
     itemClicked: (Int, Animal) -> Unit
 ) {
+    val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
     val list by itemListState.collectAsStateWithLifecycle()
 
     LaunchedEffect(listState) {
@@ -59,23 +76,42 @@ fun AnimalList(
         }
     }
 
-    LazyColumn(
-        modifier = modifier
-            .fillMaxWidth(),
-        state = listState,
-        verticalArrangement = Arrangement.spacedBy(10.dp),
-    ) {
-        item {
-            Spacer(modifier = Modifier.height(10.dp))
+    if (windowSizeClass.windowHeightSizeClass == WindowHeightSizeClass.COMPACT) {
+        LazyColumn(
+            modifier = modifier
+                .fillMaxWidth(),
+            state = listState,
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            item {
+                Spacer(modifier = Modifier.height(10.dp))
+            }
+            itemsIndexed(list) { index, item ->
+
+                AnimalItemCompact(
+                    index = index,
+                    item = item,
+                    onClicked = { i, animal -> itemClicked(i, animal) })
+            }
+            item {
+                Spacer(modifier = Modifier.height(10.dp))
+            }
         }
-        itemsIndexed(list) { index, item ->
-            AnimalItemCompact(
-                index = index,
-                item = item,
-                onClicked = { index, animal -> itemClicked(index, animal) })
-        }
-        item {
-            Spacer(modifier = Modifier.height(10.dp))
+    }
+    else {
+        LazyVerticalGrid(
+            modifier = modifier
+                .fillMaxWidth(),
+            state = rememberLazyGridState(),
+            columns = GridCells.Adaptive(100.dp),
+//            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            itemsIndexed(list) { index, item ->
+                AnimalItemExpanded(
+                    index = index,
+                    item = item,
+                    onClicked = { i, animal -> itemClicked(i, animal) })
+            }
         }
     }
 }
@@ -83,34 +119,46 @@ fun AnimalList(
 
 @Composable
 fun AnimalItemCompact(index: Int, item: Animal, onClicked: (Int, Animal) -> Unit) {
-    Card(
+    Box(
         modifier = Modifier
             .fillMaxWidth()
+            .background(color = Color.White, shape = RoundedCornerShape(10.dp))
+            .border(BorderStroke(1.dp, Color.LightGray), shape = RoundedCornerShape(10.dp))
             .clickable {
                 onClicked(index, item)
             }
             .padding(10.dp),
-        shape = RoundedCornerShape(10.dp),
-        border = BorderStroke(1.dp, Color.LightGray),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White,
-        )
     ) {
-        Row {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(IntrinsicSize.Min)
+        ) {
             GlideImage(
+                modifier = Modifier
+                    .aspectRatio(1f)
+                    .clip(RoundedCornerShape(10.dp))
+                    .layout { measurable, constraints ->
+                        if (constraints.maxHeight == Constraints.Infinity) {
+                            layout(0, 0) {}
+                        } else {
+                            val placeable = measurable.measure(constraints)
+                            layout(placeable.width, placeable.height) {
+                                placeable.place(0, 0)
+                            }
+                        }
+                    },
                 imageModel = { item.filename }, // loading a network image using an URL.
                 imageOptions = ImageOptions(
                     contentScale = ContentScale.Crop,
                     alignment = Alignment.Center
                 ),
                 loading = { LoadingIcon() },
-                failure = {
-                    PlaceHolderIcon()
-                }
+                failure = { PlaceHolderIcon() }
             )
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .weight(1f)
                     .padding(start = 10.dp)
                     .background(Color.White),
                 verticalArrangement = Arrangement.Center,
@@ -222,40 +270,37 @@ fun AnimalItemMedium(index: Int, item: Animal, onClicked: (Int, Animal) -> Unit)
 @Composable
 fun AnimalItemExpanded(index: Int, item: Animal, onClicked: (Int, Animal) -> Unit) {
 
-    Card(
+    Box(
         modifier = Modifier
-            .fillMaxWidth()
+            .background(color = Color.White, shape = RoundedCornerShape(10.dp))
+            .border(BorderStroke(1.dp, Color.LightGray), shape = RoundedCornerShape(10.dp))
             .clickable {
                 onClicked(index, item)
             }
             .padding(10.dp),
-        shape = RoundedCornerShape(10.dp),
-        border = BorderStroke(1.dp, Color.LightGray),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White,
-        )
     ) {
-        Row {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
             GlideImage(
-                imageModel = { item.popfile }, // loading a network image using an URL.
+                modifier = Modifier
+                    .aspectRatio(1f)
+                    .clip(RoundedCornerShape(10.dp)),
+                imageModel = { item.filename }, // loading a network image using an URL.
                 imageOptions = ImageOptions(
                     contentScale = ContentScale.Crop,
                     alignment = Alignment.Center
                 ),
                 loading = { LoadingIcon() },
-                failure = {
-                    PlaceHolderIcon()
-                }
+                failure = { PlaceHolderIcon() }
             )
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.White)
-                    .padding(start = 10.dp),
+                    .background(Color.White),
                 verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.Start
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Spacer(modifier = Modifier.height(10.dp))
                 Text(
                     modifier = Modifier.padding(start = 10.dp),
                     style = TextStyle(
