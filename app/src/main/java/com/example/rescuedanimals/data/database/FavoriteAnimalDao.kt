@@ -36,5 +36,5 @@ interface FavoriteAnimalDao {
     fun getAll(): Flow<List<AnimalEntity>>
 
     @Query("SELECT * FROM animal where desertionNo = :desertionNo")
-    fun getFavoriteAnimal(desertionNo: String): Flow<AnimalEntity>
+    fun selectFavoriteAnimal(desertionNo: String): Flow<AnimalEntity>
 }

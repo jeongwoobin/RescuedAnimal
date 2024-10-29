@@ -9,7 +9,7 @@ import com.example.rescuedanimals.data.util.ListConverter
 @Database(entities = [AnimalEntity::class], version = 1, exportSchema = false)
 @TypeConverters(ListConverter::class)
 abstract class FavoriteAnimalDatabase : RoomDatabase() {
-    abstract fun getFavoriteAnimalDao(): FavoriteAnimalDao
+    abstract fun selectFavoriteAnimalDao(): FavoriteAnimalDao
 
     companion object {
         const val DATABASE_NAME = "favorite_animal.db"

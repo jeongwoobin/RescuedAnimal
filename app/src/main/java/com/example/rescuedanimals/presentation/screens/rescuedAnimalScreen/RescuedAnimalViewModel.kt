@@ -1,8 +1,5 @@
 package com.example.rescuedanimals.presentation.screens.rescuedAnimalScreen
 
-import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.rescuedanimals.domain.entity.Animal
@@ -10,7 +7,7 @@ import com.example.rescuedanimals.domain.entity.Event
 import com.example.rescuedanimals.domain.entity.Result
 import com.example.rescuedanimals.domain.entity.Status
 import com.example.rescuedanimals.domain.usecase.DeleteFavoriteAnimalUseCase
-import com.example.rescuedanimals.domain.usecase.GetFavoriteAnimalUseCase
+import com.example.rescuedanimals.domain.usecase.SelectFavoriteAnimalUseCase
 import com.example.rescuedanimals.domain.usecase.GetRescuedAnimalUseCase
 import com.example.rescuedanimals.domain.usecase.InsertFavoriteAnimalUseCase
 import com.example.rescuedanimals.presentation.utils.Utils
@@ -20,8 +17,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -30,10 +25,15 @@ import javax.inject.Inject
 @HiltViewModel
 class RescuedAnimalViewModel @Inject constructor(
     private val getRescuedAnimalUseCase: GetRescuedAnimalUseCase,
-    private val getFavoriteAnimalUseCase: GetFavoriteAnimalUseCase,
+    private val selectFavoriteAnimalUseCase: SelectFavoriteAnimalUseCase,
     private val insertFavoriteAnimalUseCase: InsertFavoriteAnimalUseCase,
     private val deleteFavoriteAnimalUseCase: DeleteFavoriteAnimalUseCase
 ) : ViewModel() {
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            getRescuedAnimal(refresh = true)
+        }
+    }
 
     private var pageNo: Int = 1
 

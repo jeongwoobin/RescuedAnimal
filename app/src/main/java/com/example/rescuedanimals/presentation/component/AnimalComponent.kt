@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -48,70 +49,106 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.window.core.layout.WindowHeightSizeClass
+import androidx.window.core.layout.WindowWidthSizeClass
 import com.example.rescuedanimals.domain.entity.Animal
+import com.example.rescuedanimals.domain.entity.Result
+import com.example.rescuedanimals.domain.entity.Status
 import com.example.rescuedanimals.ui.theme.Diary_Green_400
+import com.orhanobut.logger.Logger
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
 
 
 @Composable
 fun AnimalList(
     modifier: Modifier = Modifier,
-    listState: LazyListState,
+    listState: LazyGridState,
     itemListState: StateFlow<List<Animal>>,
+    resultState: StateFlow<Result<Any>>,
     onLoadMore: (Boolean) -> Unit,
     itemClicked: (Int, Animal) -> Unit
 ) {
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
     val list by itemListState.collectAsStateWithLifecycle()
+    val state by resultState.collectAsStateWithLifecycle()
 
     LaunchedEffect(listState) {
-        snapshotFlow {
-            listState.firstVisibleItemIndex
-        }.collect { visibleIndex ->
-            if (visibleIndex == listState.layoutInfo.totalItemsCount - 20 && listState.lastScrolledForward) {
+
+        snapshotFlow { listState.firstVisibleItemIndex }
+            .map { index ->
+                val totalCount = listState.layoutInfo.totalItemsCount
+                val temp = totalCount - 20
+
+                Logger.d("index: $index, totalCount: ${totalCount}")
+                totalCount != 0 && index > temp
+            }
+            .distinctUntilChanged()
+            .filter { it }
+            .collect {
                 onLoadMore(false)
             }
-        }
     }
+//    LaunchedEffect(listState) {
+//        snapshotFlow {
+//            listState.firstVisibleItemIndex
+//        }.collect { visibleIndex ->
+//
+//            val totalCount =listState.layoutInfo.totalItemsCount
+//            val temp = totalCount - 20
+//            Logger.d("visibleIndex: $visibleIndex, totalCount: $totalCount")
+//            if (visibleIndex in temp..temp + 2 && listState.lastScrolledForward && state.status != Status.LOADING) {
+//                onLoadMore(false)
+//            }
+//
+//        }
+//    }
 
-    if (windowSizeClass.windowHeightSizeClass == WindowHeightSizeClass.COMPACT) {
-        LazyColumn(
-            modifier = modifier
-                .fillMaxWidth(),
-            state = listState,
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-            item {
-                Spacer(modifier = Modifier.height(10.dp))
-            }
-            itemsIndexed(list) { index, item ->
-
+//        LazyColumn(
+//            modifier = modifier
+//                .fillMaxWidth(),
+//            state = listState,
+//            verticalArrangement = Arrangement.spacedBy(10.dp),
+//        ) {
+//            item {
+//                Spacer(modifier = Modifier.height(10.dp))
+//            }
+//            itemsIndexed(list) { index, item ->
+//
+//                AnimalItemCompact(
+//                    index = index,
+//                    item = item,
+//                    onClicked = { i, animal -> itemClicked(i, animal) })
+//            }
+//            item {
+//                Spacer(modifier = Modifier.height(10.dp))
+//            }
+//        }
+    LazyVerticalGrid(
+        modifier = modifier
+            .fillMaxWidth(),
+        state = listState,
+        contentPadding = PaddingValues(vertical = 10.dp),
+        columns = if (windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.COMPACT) GridCells.Fixed(
+            1
+        ) else GridCells.Adaptive(200.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        itemsIndexed(list) { index, item ->
+            if ((windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.COMPACT))
                 AnimalItemCompact(
                     index = index,
                     item = item,
                     onClicked = { i, animal -> itemClicked(i, animal) })
-            }
-            item {
-                Spacer(modifier = Modifier.height(10.dp))
-            }
-        }
-    }
-    else {
-        LazyVerticalGrid(
-            modifier = modifier
-                .fillMaxWidth(),
-            state = rememberLazyGridState(),
-            columns = GridCells.Adaptive(100.dp),
-//            verticalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-            itemsIndexed(list) { index, item ->
+            else
                 AnimalItemExpanded(
                     index = index,
                     item = item,
                     onClicked = { i, animal -> itemClicked(i, animal) })
-            }
         }
     }
 }

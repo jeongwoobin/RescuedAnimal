@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
@@ -17,15 +17,15 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import androidx.window.core.layout.WindowHeightSizeClass
+import androidx.window.core.layout.WindowWidthSizeClass
 import com.example.rescuedanimals.presentation.component.BaseScreen
 import com.example.rescuedanimals.presentation.component.CustomPullToRefreshBox
 import com.example.rescuedanimals.presentation.component.GoToTopFAB
 import com.example.rescuedanimals.presentation.component.Header
 import com.example.rescuedanimals.presentation.component.LinearProgressBar
 import com.example.rescuedanimals.presentation.component.AnimalList
-import com.example.rescuedanimals.presentation.component.HorizontalDivider
-import com.example.rescuedanimals.presentation.component.VerticalDivider
+import com.example.rescuedanimals.presentation.component.HDivider
+import com.example.rescuedanimals.presentation.component.VDivider
 import com.example.rescuedanimals.presentation.navigation.Screen
 import kotlinx.coroutines.launch
 
@@ -36,13 +36,9 @@ fun RescuedAnimalScreen(
 ) {
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
     val coroutineScope = rememberCoroutineScope()
-    val listState = rememberLazyListState()
+    val listState = rememberLazyGridState()
     val snackbarHostState = remember { SnackbarHostState() }
     val snackbar by rescuedAnimalViewModel.snackbarEvent.collectAsStateWithLifecycle()
-
-    LaunchedEffect(Unit) {
-        rescuedAnimalViewModel.getRescuedAnimal(refresh = true)
-    }
 
     LaunchedEffect(snackbar) {
         snackbar.getContentIfNotHandled()?.let {
@@ -62,14 +58,14 @@ fun RescuedAnimalScreen(
                 }
             })
         }) {
-        if (windowSizeClass.windowHeightSizeClass == WindowHeightSizeClass.COMPACT)
+        if (windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.COMPACT)
             Column {
                 Header(
                     route = Screen.RescuedAnimalScreen,
                     rightButtonClicked = {
                         navController.navigate(Screen.FavoriteScreen.route)
                     })
-                HorizontalDivider(modifier = Modifier.padding(horizontal = 20.dp))
+                HDivider(modifier = Modifier.padding(horizontal = 20.dp))
                 CustomPullToRefreshBox(
                     modifier = Modifier
                         .weight(1f)
@@ -79,6 +75,7 @@ fun RescuedAnimalScreen(
                         modifier = Modifier.fillMaxSize(),
                         listState = listState,
                         itemListState = rescuedAnimalViewModel.rescuedAnimalList,
+                        resultState = rescuedAnimalViewModel.resultState,
                         onLoadMore = { refresh ->
                             coroutineScope.launch {
                                 rescuedAnimalViewModel.getRescuedAnimal(
@@ -104,7 +101,7 @@ fun RescuedAnimalScreen(
                     rightButtonClicked = {
                         navController.navigate(Screen.FavoriteScreen.route)
                     })
-                VerticalDivider(modifier = Modifier.padding(vertical = 20.dp))
+                VDivider(modifier = Modifier.padding(vertical = 20.dp))
                 CustomPullToRefreshBox(
                     modifier = Modifier
                         .weight(1f)
@@ -114,6 +111,7 @@ fun RescuedAnimalScreen(
                         modifier = Modifier.fillMaxSize(),
                         listState = listState,
                         itemListState = rescuedAnimalViewModel.rescuedAnimalList,
+                        resultState = rescuedAnimalViewModel.resultState,
                         onLoadMore = { refresh ->
                             coroutineScope.launch {
                                 rescuedAnimalViewModel.getRescuedAnimal(

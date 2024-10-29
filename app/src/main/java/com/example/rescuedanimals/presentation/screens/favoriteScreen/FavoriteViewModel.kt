@@ -7,8 +7,7 @@ import com.example.rescuedanimals.domain.entity.Event
 import com.example.rescuedanimals.domain.entity.Result
 import com.example.rescuedanimals.domain.entity.Status
 import com.example.rescuedanimals.domain.usecase.DeleteFavoriteAnimalUseCase
-import com.example.rescuedanimals.domain.usecase.GetFavoriteAnimalUseCase
-import com.example.rescuedanimals.domain.usecase.GetRescuedAnimalUseCase
+import com.example.rescuedanimals.domain.usecase.SelectFavoriteAnimalUseCase
 import com.example.rescuedanimals.domain.usecase.InsertFavoriteAnimalUseCase
 import com.example.rescuedanimals.presentation.utils.Utils
 import com.orhanobut.logger.Logger
@@ -24,10 +23,16 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FavoriteViewModel @Inject constructor(
-    private val getFavoriteAnimalUseCase: GetFavoriteAnimalUseCase,
+    private val selectFavoriteAnimalUseCase: SelectFavoriteAnimalUseCase,
     private val insertFavoriteAnimalUseCase: InsertFavoriteAnimalUseCase,
     private val deleteFavoriteAnimalUseCase: DeleteFavoriteAnimalUseCase
 ) : ViewModel() {
+
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            selectFavoriteAnimal()
+        }
+    }
 
     private val _resultState: MutableStateFlow<Result<Any>> = MutableStateFlow(Result.success())
     val resultState: StateFlow<Result<Any>>
@@ -49,12 +54,12 @@ class FavoriteViewModel @Inject constructor(
         _resultState.update { state }
     }
 
-    suspend fun getFavoriteAnimal() {
+    suspend fun selectFavoriteAnimal() {
         viewModelScope.launch(Dispatchers.IO) {
-            getFavoriteAnimalUseCase()
+            selectFavoriteAnimalUseCase()
                 .onStart { emit(Result.loading(null)) }
                 .collect { result ->
-                    Logger.d("getFavoriteAnimal result status: ${result.status}")
+                    Logger.d("selectFavoriteAnimal result status: ${result.status}")
                     setResultState(result)
                     when (result.status) {
                         Status.SUCCESS -> {

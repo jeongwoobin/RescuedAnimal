@@ -23,6 +23,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
@@ -39,7 +40,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.dp
-import androidx.window.core.layout.WindowHeightSizeClass
+import androidx.window.core.layout.WindowWidthSizeClass
 import com.example.rescuedanimals.presentation.navigation.Screen
 import com.example.rescuedanimals.ui.theme.Line_Thin
 import com.example.rescuedanimals.ui.theme.Primary_Red_500
@@ -56,7 +57,7 @@ fun Header(
 ) {
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
 
-    if (windowSizeClass.windowHeightSizeClass == WindowHeightSizeClass.COMPACT)
+    if (windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.COMPACT)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -128,7 +129,7 @@ fun GoToTopFAB(onClicked: () -> Unit) {
 }
 
 @Composable
-fun HorizontalDivider(modifier: Modifier = Modifier, color: Color = Line_Thin) {
+fun HDivider(modifier: Modifier = Modifier, color: Color = Line_Thin) {
     HorizontalDivider(
         modifier = modifier
             .height(1.dp)
@@ -137,8 +138,8 @@ fun HorizontalDivider(modifier: Modifier = Modifier, color: Color = Line_Thin) {
 }
 
 @Composable
-fun VerticalDivider(modifier: Modifier = Modifier, color: Color = Line_Thin) {
-    HorizontalDivider(
+fun VDivider(modifier: Modifier = Modifier, color: Color = Line_Thin) {
+    VerticalDivider(
         modifier = modifier
             .width(1.dp)
             .fillMaxHeight(), color = color

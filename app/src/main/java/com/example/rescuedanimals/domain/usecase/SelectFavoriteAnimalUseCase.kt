@@ -6,7 +6,7 @@ import com.example.rescuedanimals.domain.repository.local.FavoriteAnimalReposito
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class GetFavoriteAnimalUseCase @Inject constructor(
+class SelectFavoriteAnimalUseCase @Inject constructor(
     private val repo: FavoriteAnimalRepository
 ) {
 

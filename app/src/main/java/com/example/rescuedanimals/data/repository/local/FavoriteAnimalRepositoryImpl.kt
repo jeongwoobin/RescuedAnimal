@@ -22,8 +22,8 @@ class FavoriteAnimalRepositoryImpl @Inject constructor(
             }
 
 
-    override suspend fun getFavoriteAnimal(desertionNo: String): Flow<Result<Animal>> =
-        favoriteAnimalDataSource.getFavoriteAnimal(desertionNo = desertionNo)
+    override suspend fun selectFavoriteAnimal(desertionNo: String): Flow<Result<Animal>> =
+        favoriteAnimalDataSource.selectFavoriteAnimal(desertionNo = desertionNo)
             .map { value -> Result.success(AnimalMapper.mapperToAnimal(value)) }
             .catch {
                 emit(Result.fail(message = "저장된 데이터를 가져오는데 실패했습니다."))

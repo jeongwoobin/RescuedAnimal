@@ -8,7 +8,7 @@ interface FavoriteAnimalRepository {
 
     suspend fun getAll(): Flow<Result<List<Animal>>>
 
-    suspend fun getFavoriteAnimal(desertionNo: String): Flow<Result<Animal>>
+    suspend fun selectFavoriteAnimal(desertionNo: String): Flow<Result<Animal>>
 
     suspend fun insertFavoriteAnimal(favoriteAnimal: Animal): Flow<Result<Boolean>>
 
