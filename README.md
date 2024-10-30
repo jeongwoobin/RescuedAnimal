@@ -1,15 +1,15 @@
 # RescuedAnimal
 
 ## 사용한 기술 스택
-Clean Architecture
-Kotlin
-MVVM Pattern
-Repository Pattern
-DI(Hilt)
-Retrofit
-Moshi
-Room
-Navigation
+Clean Architecture  
+Kotlin  
+MVVM Pattern  
+Repository Pattern  
+DI(Hilt)  
+Retrofit  
+Moshi  
+Room  
+Navigation  
 Compose  
   
   
