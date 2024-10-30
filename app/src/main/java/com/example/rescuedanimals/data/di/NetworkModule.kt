@@ -1,7 +1,11 @@
 package com.example.rescuedanimals.data.di
 
+import android.content.Context
 import com.example.rescuedanimals.BuildConfig
 import com.example.rescuedanimals.data.util.AuthInterceptor
+import com.example.rescuedanimals.data.util.LiveNetworkMonitor
+import com.example.rescuedanimals.data.util.NetworkMonitor
+import com.example.rescuedanimals.data.util.NetworkMonitorInterceptor
 import com.example.rescuedanimals.data.util.PublicSrvcParamInterceptor
 import com.orhanobut.logger.Logger
 import com.squareup.moshi.Moshi
@@ -9,6 +13,7 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -51,6 +56,22 @@ object NetworkModule {
 
     @Provides
     @Singleton
+    fun provideNetworkMonitor(
+        @ApplicationContext appContext: Context
+    ): NetworkMonitor{
+        return LiveNetworkMonitor(appContext)
+    }
+
+    @Provides
+    @Singleton
+    fun provideNetworkMonitorInterceptor(
+        liveNetworkMonitor: NetworkMonitor
+    ): NetworkMonitorInterceptor {
+        return NetworkMonitorInterceptor(liveNetworkMonitor)
+    }
+
+    @Provides
+    @Singleton
     fun providePublicSrvcParamInterceptor(): PublicSrvcParamInterceptor {
         return PublicSrvcParamInterceptor
     }
@@ -60,14 +81,16 @@ object NetworkModule {
     @Provides
     fun provideOkHttpClient(
         httpLoggingInterceptor: HttpLoggingInterceptor,
+        networkMonitorInterceptor: NetworkMonitorInterceptor,
         authInterceptor: AuthInterceptor,
         publicSrvcParamInterceptor: PublicSrvcParamInterceptor
     ): OkHttpClient {
         return OkHttpClient.Builder()
             .apply {
+                addInterceptor(httpLoggingInterceptor)
+                addInterceptor(networkMonitorInterceptor)
                 addInterceptor(authInterceptor)
                 addInterceptor(publicSrvcParamInterceptor)
-                addInterceptor(httpLoggingInterceptor)
             }
             .build()
     }

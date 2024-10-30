@@ -32,6 +32,7 @@ object AnimalMapper {
             orgNm = entity.orgNm,
             chargeNm = entity.chargeNm,
             officetel = entity.officetel,
+            favorite = entity.favorite
         )
 
     fun mapperToAnimalList(animalEntity: List<AnimalEntity>): List<Animal> {
@@ -67,6 +68,7 @@ object AnimalMapper {
             orgNm = entity.orgNm,
             chargeNm = entity.chargeNm,
             officetel = entity.officetel,
+            favorite = entity.favorite
         )
 
     fun mapperToAnimalEntityList(animalEntity: List<Animal>): List<AnimalEntity> {

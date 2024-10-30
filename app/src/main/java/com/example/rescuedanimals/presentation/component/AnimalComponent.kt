@@ -28,6 +28,8 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Downloading
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
@@ -54,6 +56,7 @@ import com.example.rescuedanimals.domain.entity.Animal
 import com.example.rescuedanimals.domain.entity.Result
 import com.example.rescuedanimals.domain.entity.Status
 import com.example.rescuedanimals.ui.theme.Diary_Green_400
+import com.example.rescuedanimals.ui.theme.Primary_Red_500
 import com.orhanobut.logger.Logger
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
@@ -68,13 +71,11 @@ fun AnimalList(
     modifier: Modifier = Modifier,
     listState: LazyGridState,
     itemListState: StateFlow<List<Animal>>,
-    resultState: StateFlow<Result<Any>>,
     onLoadMore: (Boolean) -> Unit,
     itemClicked: (Int, Animal) -> Unit
 ) {
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
     val list by itemListState.collectAsStateWithLifecycle()
-    val state by resultState.collectAsStateWithLifecycle()
 
     LaunchedEffect(listState) {
 
@@ -161,11 +162,9 @@ fun AnimalItemCompact(index: Int, item: Animal, onClicked: (Int, Animal) -> Unit
             .fillMaxWidth()
             .background(color = Color.White, shape = RoundedCornerShape(10.dp))
             .border(BorderStroke(1.dp, Color.LightGray), shape = RoundedCornerShape(10.dp))
-            .clickable {
-                onClicked(index, item)
-            }
             .padding(10.dp),
     ) {
+        Logger.d("${item.favorite}")
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -221,15 +220,28 @@ fun AnimalItemCompact(index: Int, item: Animal, onClicked: (Int, Animal) -> Unit
                     text = "Name : ${item.kindCd}"
                 )
                 Spacer(modifier = Modifier.height(5.dp))
-                Text(
-                    modifier = Modifier.padding(start = 10.dp),
-                    style = TextStyle(
-                        color = Color.Gray,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Normal
-                    ),
-                    text = "Age : ${item.age}"
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        modifier = Modifier.padding(start = 10.dp),
+                        style = TextStyle(
+                            color = Color.Gray,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Normal
+                        ),
+                        text = "Age : ${item.age}"
+                    )
+                    VectorIcon(
+                        modifier = Modifier.clickable {
+                            onClicked(index, item)
+                        },
+                        vector = if (item.favorite == true) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                        tint = Primary_Red_500
+                    )
+                }
             }
         }
     }
@@ -368,6 +380,14 @@ fun AnimalItemExpanded(index: Int, item: Animal, onClicked: (Int, Animal) -> Uni
                     text = "Age : ${item.age}"
                 )
             }
+            Spacer(modifier = Modifier.height(5.dp))
+            VectorIcon(
+                modifier = Modifier.clickable {
+                    onClicked(index, item)
+                },
+                vector = if (item.favorite == true) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                tint = Primary_Red_500
+            )
         }
     }
 }

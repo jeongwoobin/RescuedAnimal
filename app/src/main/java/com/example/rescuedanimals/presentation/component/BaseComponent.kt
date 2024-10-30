@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.ArrowCircleUp
 import androidx.compose.material.icons.filled.Downloading
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FormatListNumbered
+import androidx.compose.material.icons.filled.Http
 import androidx.compose.material.icons.filled.TagFaces
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -172,7 +173,7 @@ fun LoadingIcon() {
 @Composable
 fun PlaceHolderIcon() {
     VectorIcon(
-        vector = Icons.Default.TagFaces,
+        vector = Icons.Default.Http,
         contentDescription = "image placeholder"
     )
 }

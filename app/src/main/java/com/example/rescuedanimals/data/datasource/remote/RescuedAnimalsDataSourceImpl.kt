@@ -5,6 +5,7 @@ import com.example.rescuedanimals.data.service.RescuedAnimalsApi
 import com.example.rescuedanimals.data.model.remote.BaseResponse
 import com.example.rescuedanimals.data.model.remote.ListBody
 import com.example.rescuedanimals.data.model.remote.SidoEntity
+import com.orhanobut.logger.Logger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.Response

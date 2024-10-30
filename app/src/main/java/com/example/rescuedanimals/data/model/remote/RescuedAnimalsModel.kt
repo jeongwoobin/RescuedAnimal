@@ -46,4 +46,5 @@ data class AnimalEntity(
     val orgNm: String?,
     val chargeNm: String?,
     val officetel: String?,
+    val favorite: Boolean?
 )

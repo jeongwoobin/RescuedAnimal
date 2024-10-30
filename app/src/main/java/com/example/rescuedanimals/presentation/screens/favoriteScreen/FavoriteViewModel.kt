@@ -28,12 +28,6 @@ class FavoriteViewModel @Inject constructor(
     private val deleteFavoriteAnimalUseCase: DeleteFavoriteAnimalUseCase
 ) : ViewModel() {
 
-    init {
-        viewModelScope.launch(Dispatchers.IO) {
-            selectFavoriteAnimal()
-        }
-    }
-
     private val _resultState: MutableStateFlow<Result<Any>> = MutableStateFlow(Result.success())
     val resultState: StateFlow<Result<Any>>
         get() = _resultState.asStateFlow()
@@ -46,12 +40,22 @@ class FavoriteViewModel @Inject constructor(
     val favoriteAnimalList: StateFlow<List<Animal>>
         get() = _favoriteAnimalList.asStateFlow()
 
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            selectFavoriteAnimal()
+        }
+    }
+
     private fun updateSnackbarEvent(text: String) {
         _snackbarEvent.update { Event(text) }
     }
 
     private fun setResultState(state: Result<Any>) {
-        _resultState.update { state }
+        try {
+            if ((resultState.value as Result).status != state.status)
+                _resultState.update { state }
+        } catch(e: Exception) {
+        }
     }
 
     suspend fun selectFavoriteAnimal() {
@@ -69,6 +73,38 @@ class FavoriteViewModel @Inject constructor(
                                 else {
                                     // 데이터가 없습니다
                                     updateSnackbarEvent(Utils.snackBarContent(content = "저장된 데이터가 없습니다."))
+                                }
+                            }
+                        }
+
+                        Status.LOADING -> {}
+                        else -> {
+                            updateSnackbarEvent(
+                                Utils.snackBarContent(
+                                    isError = true,
+                                    content = result.message.toString()
+                                )
+                            )
+                        }
+                    }
+                }
+        }
+    }
+
+    suspend fun deleteFavoriteAnimal(index: Int, animal: Animal) {
+        viewModelScope.launch(Dispatchers.IO) {
+            deleteFavoriteAnimalUseCase(animal)
+                .onStart { emit(Result.loading(null)) }
+                .collect { result ->
+                    Logger.d("deleteFavoriteAnimal result status: ${result.status}")
+                    setResultState(result)
+                    when (result.status) {
+                        Status.SUCCESS -> {
+                            result.data?.let { data ->
+                                if (data)
+                                    _favoriteAnimalList.update { favoriteAnimalList.value.toMutableList().apply { this.removeAt(index) } }
+                                else {
+                                    updateSnackbarEvent(Utils.snackBarContent(content = "이미 삭제된 데이터입니다."))
                                 }
                             }
                         }

@@ -75,7 +75,6 @@ fun RescuedAnimalScreen(
                         modifier = Modifier.fillMaxSize(),
                         listState = listState,
                         itemListState = rescuedAnimalViewModel.rescuedAnimalList,
-                        resultState = rescuedAnimalViewModel.resultState,
                         onLoadMore = { refresh ->
                             coroutineScope.launch {
                                 rescuedAnimalViewModel.getRescuedAnimal(
@@ -85,10 +84,18 @@ fun RescuedAnimalScreen(
                         },
                         itemClicked = { index, animal ->
                             coroutineScope.launch {
-                                rescuedAnimalViewModel.insertFavoriteAnimal(
-                                    index = index,
-                                    animal = animal
-                                )
+                                if (animal.favorite == true)
+                                    rescuedAnimalViewModel.deleteFavoriteAnimal(
+                                        index = index,
+                                        animal = animal
+                                    )
+                                else {
+                                    rescuedAnimalViewModel.insertFavoriteAnimal(
+                                        index = index,
+                                        animal = animal
+                                    )
+
+                                }
                             }
                         }
                     )
@@ -111,7 +118,6 @@ fun RescuedAnimalScreen(
                         modifier = Modifier.fillMaxSize(),
                         listState = listState,
                         itemListState = rescuedAnimalViewModel.rescuedAnimalList,
-                        resultState = rescuedAnimalViewModel.resultState,
                         onLoadMore = { refresh ->
                             coroutineScope.launch {
                                 rescuedAnimalViewModel.getRescuedAnimal(
@@ -121,10 +127,18 @@ fun RescuedAnimalScreen(
                         },
                         itemClicked = { index, animal ->
                             coroutineScope.launch {
-                                rescuedAnimalViewModel.insertFavoriteAnimal(
-                                    index = index,
-                                    animal = animal
-                                )
+                                if (animal.favorite == true)
+                                    rescuedAnimalViewModel.deleteFavoriteAnimal(
+                                        index = index,
+                                        animal = animal
+                                    )
+                                else {
+                                    rescuedAnimalViewModel.insertFavoriteAnimal(
+                                        index = index,
+                                        animal = animal
+                                    )
+
+                                }
                             }
                         }
                     )

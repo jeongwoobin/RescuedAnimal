@@ -75,7 +75,6 @@ fun FavoriteScreen(
                         modifier = Modifier.fillMaxSize(),
                         listState = listState,
                         itemListState = favoriteViewModel.favoriteAnimalList,
-                        resultState = favoriteViewModel.resultState,
                         onLoadMore = { refresh ->
                             coroutineScope.launch {
                                 favoriteViewModel.selectFavoriteAnimal()
@@ -83,10 +82,10 @@ fun FavoriteScreen(
                         },
                         itemClicked = { index, animal ->
                             coroutineScope.launch {
-//                                favoriteViewModel.insertFavoriteAnimal(
-//                                    index = index,
-//                                    animal = animal
-//                                )
+                                favoriteViewModel.deleteFavoriteAnimal(
+                                    index = index,
+                                    animal = animal
+                                )
                             }
                         }
                     )
@@ -109,7 +108,6 @@ fun FavoriteScreen(
                         modifier = Modifier.fillMaxSize(),
                         listState = listState,
                         itemListState = favoriteViewModel.favoriteAnimalList,
-                        resultState = favoriteViewModel.resultState,
                         onLoadMore = { refresh ->
                             coroutineScope.launch {
                                 favoriteViewModel.selectFavoriteAnimal()
